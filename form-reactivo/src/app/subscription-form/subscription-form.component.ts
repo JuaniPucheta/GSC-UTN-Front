@@ -2,6 +2,7 @@
 import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Subscription } from '../subscription';
+import { SubscriptionService } from '../subscription.service';
 
 @Component({
   selector: 'app-subscription-form',
@@ -12,7 +13,7 @@ export class SubscriptionFormComponent {
   subscriptionForm: FormGroup;
   submitted = false;
 
-  constructor(private fb: FormBuilder) {
+  constructor(private fb: FormBuilder, private subscriptionService: SubscriptionService) {
     this.subscriptionForm = this.fb.group({
       nombre: ['', Validators.required],
       apellido: ['', Validators.required],
@@ -27,9 +28,15 @@ export class SubscriptionFormComponent {
 
   onSubmit() {
     if (this.subscriptionForm.valid) {
-      const subscriptionData: Subscription = this.subscriptionForm.value;
-      console.log(subscriptionData);
-      this.submitted = true;
+      this.subscriptionService.crearSuscripcion(this.subscriptionForm.value).subscribe(
+        (response) => {
+          console.log('Suscripcion creada: ', response);
+          this.submitted = true;
+        },
+        (error) => {
+          console.error('Error al crear la suscripcion: ', error);
+        }
+      );
     }
   }
 }
